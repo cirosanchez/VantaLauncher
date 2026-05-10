@@ -1,0 +1,13 @@
+/home/ciro/Projects/VantaLauncher/target/debug/deps/parlance-87f6785730a0ddc8.d: /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/lib.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/bidi.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font_family.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/generic_family.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/language.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/script.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/tag.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/text.rs
+
+/home/ciro/Projects/VantaLauncher/target/debug/deps/libparlance-87f6785730a0ddc8.rmeta: /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/lib.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/bidi.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font_family.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/generic_family.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/language.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/script.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/tag.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/text.rs
+
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/lib.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/bidi.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/font_family.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/generic_family.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/language.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/script.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/tag.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parlance-0.1.0/src/text.rs:

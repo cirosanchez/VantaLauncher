@@ -1,0 +1,10 @@
+/home/ciro/Projects/VantaLauncher/target/debug/deps/accesskit_consumer-0a9fdc48a0493d30.d: /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/lib.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/tree.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/node.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/filters.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/iterators.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/text.rs
+
+/home/ciro/Projects/VantaLauncher/target/debug/deps/libaccesskit_consumer-0a9fdc48a0493d30.rmeta: /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/lib.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/tree.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/node.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/filters.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/iterators.rs /home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/text.rs
+
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/lib.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/tree.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/node.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/filters.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/iterators.rs:
+/home/ciro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.32.0/src/text.rs:

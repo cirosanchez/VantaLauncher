@@ -1,0 +1,3 @@
+cargo:rustc-check-cfg=cfg(slint_debug_property)
+cargo:rerun-if-changed=widgets
+cargo:rustc-env=SLINT_WIDGETS_LIBRARY=/home/ciro/Projects/VantaLauncher/target/debug/build/i-slint-compiler-cff439c8a5529572/out/included_library.rs

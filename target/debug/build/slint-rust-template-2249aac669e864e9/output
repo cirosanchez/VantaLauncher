@@ -1,0 +1,9 @@
+cargo:rerun-if-changed=/home/ciro/Projects/VantaLauncher/ui/app-window.slint
+cargo:rerun-if-env-changed=SLINT_STYLE
+cargo:rerun-if-env-changed=SLINT_FONT_SIZES
+cargo:rerun-if-env-changed=SLINT_SCALE_FACTOR
+cargo:rerun-if-env-changed=SLINT_ASSET_SECTION
+cargo:rerun-if-env-changed=SLINT_EMBED_RESOURCES
+cargo:rerun-if-env-changed=SLINT_EMIT_DEBUG_INFO
+cargo:rerun-if-env-changed=SLINT_LIVE_PREVIEW
+cargo:rustc-env=SLINT_INCLUDE_GENERATED=/home/ciro/Projects/VantaLauncher/target/debug/build/slint-rust-template-2249aac669e864e9/out/app-window.rs
