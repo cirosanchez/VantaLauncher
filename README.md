@@ -28,7 +28,8 @@ focused on satisfying all your needs.
 ## Roadmap
 
 - [x] Automatic settings.toml with color fields
-- [x] Sidebar 
+- [x] Sidebar
+- [ ] Microsoft and Offline Accounts (AUTH)
 - [ ] Home page
 - [ ] Profiles page
 - [ ] Per profile configuration
@@ -40,7 +41,6 @@ focused on satisfying all your needs.
 - [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Curseforge page
 - [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
-- [ ] Microsoft and Offline Accounts
 - [ ] Settings page
 
 ## ⚙️ Configuration
