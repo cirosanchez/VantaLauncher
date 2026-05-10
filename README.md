@@ -31,10 +31,15 @@ focused on satisfying all your needs.
 - [x] Sidebar 
 - [ ] Home page
 - [ ] Profiles page
+- [ ] Per profile configuration
 - [ ] Worlds page
-- [ ] Servers page
+- [ ] Cherished Worlds
+- [ ] Servers page 
+- [ ] Favorite servers 
 - [ ] Modrinth page
+- [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Curseforge page
+- [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Microsoft and Offline Accounts
 - [ ] Settings page
 
