@@ -1,38 +1,73 @@
-# Slint Rust Template
+<div align="center">
+  <img src="assets/logo.png" alt="VantaLauncher Logo" width="160">
 
-A template for a Rust application that's using [Slint](https://slint.rs/) for the user interface.
+  # VantaLauncher
+  **The ultimate high-performance Minecraft launcher**
 
-## About
+  [![Rust](https://img.shields.io/badge/Language-Rust-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
+  [![Slint](https://img.shields.io/badge/UI-Slint-blue?style=for-the-badge)](https://slint.dev/)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-This template helps you get started developing a Rust application with Slint as toolkit
-for the user interface. It demonstrates the integration between the `.slint` UI markup and
-Rust code, how to react to callbacks, get and set properties, and use basic widgets.
+  ---
 
-## Usage
+  <p align="center">
+    VantaLauncher is a modern Minecraft launcher designed for speed, user experience, and customizability. 
+    <br />
+    Using the power of <b>Rust</b> and <b>Slint</b>, VantaLauncher provides reliabiliity and blazing fast performance to
+    manage your instances, mods and other minecraft needs.
+  </p>
+</div>
 
-1. Install Rust by following its [getting-started guide](https://www.rust-lang.org/learn/get-started).
-   Once this is done, you should have the `rustc` compiler and the `cargo` build system installed in your `PATH`.
-2. Download and extract the [ZIP archive of this repository](https://github.com/slint-ui/slint-rust-template/archive/refs/heads/main.zip).
-3. Rename the extracted directory and change into it:
-    ```
-    mv slint-rust-template-main my-project
-    cd my-project    
-    ```
-4. Build with `cargo`:
-    ```
-    cargo build
-    ```
-5. Run the application binary:
-    ```
-    cargo run
-    ```
+Inspired by the need of a lightweight user-first launcher, Vanta offers a minimalistic, yet performant interface 
+focused on satisfying all your needs.
+- **Blazing Performance**: Native Rust core ensures lightning-fast startup and minimal resource usage.
+- **Customizable**: Customize the launcher to your needs, thought for power users.
+- **Modding Heaven**: Built-in support for **Modrinth** and **CurseForge** directly in the launcher.
+- **Profile Management**: Easily manage your profiles, worlds, and frequent servers from a unified sidebar.
 
-We recommend using an IDE for development, along with our [LSP-based IDE integration for `.slint` files](https://github.com/slint-ui/slint/blob/master/tools/lsp/README.md). You can also load this project directly in [Visual Studio Code](https://code.visualstudio.com) and install our [Slint extension](https://marketplace.visualstudio.com/items?itemName=Slint.slint).
+## Roadmap
 
-## Next Steps
+- [x] Automatic settings.toml with color fields
+- [x] Sidebar 
+- [ ] Home page
+- [ ] Profiles page
+- [ ] Worlds page
+- [ ] Servers page
+- [ ] Modrinth page
+- [ ] Curseforge page
+- [ ] Microsoft and Offline Accounts
+- [ ] Settings page
 
-We hope that this template helps you get started, and that you enjoy exploring making user interfaces with Slint. To learn more
-about the Slint APIs and the `.slint` markup language, check out our [online documentation](https://slint.dev/docs).
+## ⚙️ Configuration
 
-Don't forget to edit this readme to replace it by yours, and edit the `name =` field in `Cargo.toml` to match the name of your
-project.
+VantaLauncher follows system standards for configuration storage:
+
+| OS | Configuration Path |
+| --- | --- |
+| **Linux** | `~/.config/VantaLauncher/settings.toml` |
+| **Windows** | `%AppData%\cirosanchez\VantaLauncher\config\settings.toml` |
+| **macOS** | `~/Library/Application Support/dev.cirosanchez.VantaLauncher/settings.toml` |
+
+## 💬 Support
+
+Need help or want to chat with the community? Join our Discord server!
+
+<a href="https://discord.cirosanchez.dev">
+  <img src="https://img.shields.io/badge/Discord-Join%20the%20Server-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Support">
+</a>
+
+## 🤝 Contributing
+
+We welcome contributions of all kinds! Whether it's reporting a bug, suggesting a feature, or submitting a pull request, your help is appreciated.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
