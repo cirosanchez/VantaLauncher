@@ -1,0 +1,29 @@
+export component Icon {
+    in property <image> source;
+    in property <color> color;
+    in property <color> hover_color;
+
+    callback clicked;
+
+    width: 32px;
+    height: 32px;
+
+    touch := TouchArea {
+        clicked => {
+            root.clicked()
+        }
+    }
+
+    Image {
+        source: root.source;
+
+        width: parent.width;
+        height: parent.height;
+
+        image-fit: contain;
+
+        colorize: touch.has-hover
+            ? root.hover_color
+            : root.color;
+    }
+}
