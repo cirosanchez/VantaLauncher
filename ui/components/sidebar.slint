@@ -1,0 +1,120 @@
+import { Separator } from "separator.slint";
+import { Icon } from "icon.slint";
+
+export global Theme {
+    in-out property <color> accent_1: #0a0a0a;
+    in-out property <color> accent_2: #171717;
+    in-out property <color> accent_3: #262626;
+    in-out property <color> accent_4: #404040;
+    in-out property <color> accent_5: #525252;
+    in-out property <color> accent_6: #737373;
+    in-out property <color> accent_7: #a3a3a3;
+    in-out property <color> accent_8: #d4d4d4;
+    in-out property <color> accent_9: #e5e5e5;
+    in-out property <color> accent_10: #f5f5f5;
+    in-out property <color> accent_11: #fafafa;
+}
+
+export component Sidebar inherits Rectangle {
+    width: 45px;
+    height: 100%; // Default to full height, can be overridden
+
+    border-color: Theme.accent_3;
+    border-radius: 12px;
+    border-width: 2px;
+    background: Theme.accent_2;
+
+    Icon {
+        source: @image-url("../../assets/logo.png");
+        x: 7px;
+        y: 12px;
+        clicked => { debug("logo clicked") }
+    }
+
+    Separator {
+        separator_color: Theme.accent_3;
+        width: parent.width - 24px;
+        x: 12px;
+        y: 56px;
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/house.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 68px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("home clicked") }
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/library.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 104px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("library clicked") }
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/earth.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 140px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("worlds clicked") }
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/server.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 176px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("servers clicked") }
+    }
+
+    Separator {
+        separator_color: Theme.accent_3;
+        width: parent.width - 24px;
+        x: 12px;
+        y: 212px;
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/modrinth.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 224px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("modrinth clicked") }
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/curseforge.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: 260px;
+        width: 24px;
+        height: 24px;
+        clicked => { debug("curseforge clicked") }
+    }
+
+    Separator {
+        separator_color: Theme.accent_3;
+        width: parent.width - 24px;
+        x: 12px;
+        y: 272px;
+    }
+}
