@@ -1,5 +1,6 @@
 use crate::auth::microsoft::{MicrosoftAuth, MicrosoftLoginRequest};
 use crate::auth::offline::create_offline_account;
+use crate::auth::storage::{AuthData, AuthStorage};
 use crate::auth::Account;
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
@@ -15,17 +16,56 @@ type AuthResult<T> = Result<T, Box<dyn Error + Send + Sync>>;
 
 pub struct AccountManager {
     microsoft: MicrosoftAuth,
+    data: Mutex<AuthData>,
 }
 
 impl AccountManager {
     pub fn new() -> Self {
         Self {
             microsoft: MicrosoftAuth::new(),
+            data: Mutex::new(AuthStorage::load()),
         }
     }
 
-    pub fn login_offline(&self, username: &str) -> Account {
-        create_offline_account(username)
+    pub async fn add_account(&self, account: Account) {
+        let mut data = self.data.lock().await;
+
+        // If account already exists, update it, otherwise add it
+        if let Some(existing) = data.accounts.iter_mut().find(|a| a.id == account.id) {
+            *existing = account.clone();
+        } else {
+            data.accounts.push(account.clone());
+        }
+
+        data.active_account_id = Some(account.id);
+        AuthStorage::save(&data);
+    }
+
+    pub async fn get_active_account(&self) -> Option<Account> {
+        let data = self.data.lock().await;
+        let id = data.active_account_id.as_ref()?;
+        data.accounts.iter().find(|a| &a.id == id).cloned()
+    }
+
+    pub async fn list_accounts(&self) -> Vec<Account> {
+        self.data.lock().await.accounts.clone()
+    }
+
+    pub async fn set_active_account(&self, id: &str) -> bool {
+        let mut data = self.data.lock().await;
+        if data.accounts.iter().any(|a| a.id == id) {
+            data.active_account_id = Some(id.to_string());
+            AuthStorage::save(&data);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub async fn login_offline(&self, username: &str) -> Account {
+        let account = create_offline_account(username);
+        self.add_account(account.clone()).await;
+        account
     }
 
     pub fn begin_microsoft_login(&self) -> MicrosoftLoginRequest {
@@ -75,6 +115,8 @@ impl AccountManager {
             .microsoft
             .finish_login(callback.code, request.pkce_verifier)
             .await?;
+
+        self.add_account(account.clone()).await;
 
         server.abort();
         Ok(account)

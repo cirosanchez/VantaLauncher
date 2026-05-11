@@ -1,14 +1,11 @@
 use slint::ComponentHandle;
 use crate::config::Settings;
-use crate::AppWindow;
 use crate::Theme;
 
 pub struct ThemeManager;
 
 impl ThemeManager {
-    pub fn apply(ui: &AppWindow, settings: &Settings) {
-        let theme = ui.global::<Theme>();
-
+    pub fn apply(theme: Theme, settings: &Settings) {
         theme.set_accent_1(
             Self::hex_to_color(&settings.theme_accent_1)
         );
