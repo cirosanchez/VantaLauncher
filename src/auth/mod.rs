@@ -1,10 +1,7 @@
-pub mod account;
+mod account;
 pub mod manager;
-pub mod microsoft;
-pub mod offline;
-pub mod storage;
-pub mod types;
+mod session;
+mod storage;
 
 pub use manager::AccountManager;
-
-pub use types::*;
+pub use account::Account;
