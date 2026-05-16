@@ -1,21 +1,26 @@
-mod config;
-mod theme;
 mod auth;
-mod external;
+mod config;
+mod providers;
+mod theme;
 
 use std::error::Error;
 use std::sync::Arc;
 
-use config::Settings;
 use crate::theme::ThemeManager;
+use config::Settings;
 
 slint::include_modules!();
 
-async fn load_account_head_image(account: &auth::Account) -> Result<slint::Image, Box<dyn Error + Send + Sync>> {
+async fn load_account_head_image(
+    account: &auth::Account,
+) -> Result<slint::Image, Box<dyn Error + Send + Sync>> {
     let response = reqwest::get(account.avatar_url()).await?;
     let body = response.error_for_status()?.bytes().await?;
 
-    let temp_path = std::env::temp_dir().join(format!("vanta-avatar-{}.png", account.avatar_url().rsplit('/').next().unwrap_or("0")));
+    let temp_path = std::env::temp_dir().join(format!(
+        "vanta-avatar-{}.png",
+        account.avatar_url().rsplit('/').next().unwrap_or("0")
+    ));
     std::fs::write(&temp_path, &body)?;
 
     Ok(slint::Image::load_from_path(&temp_path)?)

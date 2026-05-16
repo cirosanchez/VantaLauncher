@@ -1,25 +1,20 @@
 use crate::auth::account::{Account, AccountType};
 use crate::auth::session::{MicrosoftSession, Session};
+use minecraft_msa_auth::MinecraftAuthorizationFlow;
 use oauth2::basic::BasicClient;
+use oauth2::reqwest::{Client, Url};
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, CsrfToken, PkceCodeChallenge, PkceCodeVerifier,
-    RedirectUrl, Scope, TokenResponse, TokenUrl,
+    AuthType, AuthUrl, AuthorizationCode, ClientId, CsrfToken, PkceCodeChallenge, RedirectUrl,
+    Scope, TokenResponse, TokenUrl,
 };
 use serde_json::Value;
-use std::error::Error;
 use std::time::{SystemTime, UNIX_EPOCH};
-
-type AuthResult<T> = Result<T, Box<dyn Error + Send + Sync>>;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::TcpListener;
 
 pub(crate) struct MicrosoftAuth {
     pub client_id: String,
     pub redirect_uri: String,
-}
-
-pub(crate) struct MicrosoftLoginRequest {
-    pub auth_url: String,
-    pub state: String,
-    pub pkce_verifier: String,
 }
 
 impl MicrosoftAuth {
@@ -30,188 +25,124 @@ impl MicrosoftAuth {
         }
     }
 
-    pub(crate) fn authorization_request(&self) -> MicrosoftLoginRequest {
+    pub(crate) async fn login_interactive(&self) -> Option<Account> {
+        let token_uri = TokenUrl::new(
+            "https://login.microsoftonline.com/consumers/oauth2/v2.0/token".to_string(),
+        )
+        .ok()?;
+        let auth_uri = AuthUrl::new(
+            "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize".to_string(),
+        )
+        .ok()?;
+        let redirect_uri = RedirectUrl::new(self.redirect_uri.clone()).ok()?;
+
         let client = BasicClient::new(ClientId::new(self.client_id.clone()))
-            .set_auth_uri(AuthUrl::new(
-                "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize".to_string(),
-            )
-                .unwrap())
-            .set_token_uri(TokenUrl::new(
-                "https://login.microsoftonline.com/consumers/oauth2/v2.0/token".to_string(),
-            )
-                .unwrap())
-            .set_redirect_uri(RedirectUrl::new(self.redirect_uri.clone()).unwrap());
+            .set_token_uri(token_uri)
+            .set_auth_uri(auth_uri)
+            .set_auth_type(AuthType::RequestBody)
+            .set_redirect_uri(redirect_uri);
 
-        let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
+        let (pkce_code_challenge, pkce_code_verifier) = PkceCodeChallenge::new_random_sha256();
 
-        let (auth_url, state) = client
+        let (authorize_url, csrf_state) = client
             .authorize_url(CsrfToken::new_random)
-            .add_scope(Scope::new("xboxlive.signin".to_string()))
-            .add_scope(Scope::new("xboxlive.offline_access".to_string()))
-            .set_pkce_challenge(pkce_challenge)
+            .add_scope(Scope::new("XboxLive.signin offline_access".to_string()))
+            .set_pkce_challenge(pkce_code_challenge)
             .url();
 
-        MicrosoftLoginRequest {
-            auth_url: auth_url.to_string(),
-            state: state.secret().to_string(),
-            pkce_verifier: pkce_verifier.secret().to_string(),
+        let listener = TcpListener::bind("127.0.0.1:6767").await.ok()?;
+        open::that(authorize_url.to_string()).ok()?;
+
+        loop {
+            let (stream, _) = listener.accept().await.ok()?;
+            stream.readable().await.ok()?;
+            let mut stream = BufReader::new(stream);
+
+            let code;
+            let state;
+            {
+                let mut request_line = String::new();
+                stream.read_line(&mut request_line).await.ok()?;
+
+                let redirect_url = request_line.split_whitespace().nth(1)?;
+                let url = Url::parse(&("http://localhost:6767".to_string() + redirect_url)).ok()?;
+
+                let (_, value) = url.query_pairs().find(|(key, _)| key == "code")?;
+                code = AuthorizationCode::new(value.into_owned());
+
+                let (_, value) = url.query_pairs().find(|(key, _)| key == "state")?;
+                state = CsrfToken::new(value.into_owned());
+            }
+
+            let message = r#"<!doctype html>
+                <html lang="en">
+                <head>
+                  <meta charset="utf-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1" />
+                  <title>Authentication complete</title>
+                  <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; margin: 2rem; }
+                  </style>
+                </head>
+                <body>
+                  <h2>Authentication complete</h2>
+                  <p>You can close this tab and return to the launcher.</p>
+                </body>
+                </html>"#;
+            let response = format!(
+                "HTTP/1.1 200 OK\r\ncontent-type: text/html; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
+                message.len(),
+                message
+            );
+            stream.write_all(response.as_bytes()).await.ok()?;
+            stream.flush().await.ok()?;
+            stream.get_mut().shutdown().await.ok()?;
+
+            if state.secret() != csrf_state.secret() {
+                return None;
+            }
+
+            let token = client
+                .exchange_code(code)
+                .set_pkce_verifier(pkce_code_verifier)
+                .request_async(&Client::new())
+                .await
+                .ok()?;
+
+            let mc_flow = MinecraftAuthorizationFlow::new(Client::new());
+            let mc_token = mc_flow
+                .exchange_microsoft_token(token.access_token().secret())
+                .await
+                .ok()?;
+
+            let profile = reqwest::Client::new()
+                .get("https://api.minecraftservices.com/minecraft/profile")
+                .bearer_auth(mc_token.access_token().as_ref())
+                .send()
+                .await
+                .ok()?
+                .error_for_status()
+                .ok()?
+                .json::<Value>()
+                .await
+                .ok()?;
+
+            let profile_id = profile.get("id")?.as_str()?.to_string();
+            let refresh_token = token.refresh_token()?.secret().to_string();
+            let expires_at = SystemTime::now().duration_since(UNIX_EPOCH).ok()?.as_secs() as i64
+                + i64::from(mc_token.expires_in());
+
+            return Some(Account {
+                id: profile_id.clone(),
+                username: mc_token.username().to_string(),
+                account_type: AccountType::Microsoft,
+                session: Session::Microsoft(MicrosoftSession {
+                    access_token: mc_token.access_token().as_ref().to_string(),
+                    refresh_token,
+                    uuid: profile_id,
+                    expires_at,
+                }),
+            });
         }
-    }
-
-    pub(crate) async fn finish_login(&self, code: String, pkce_verifier: String) -> AuthResult<Account> {
-        fn missing(field: &str) -> std::io::Error {
-            std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                format!("missing field in auth response: {field}"),
-            )
-        }
-
-        // 1) Exchange Microsoft OAuth code for tokens.
-        let oauth_client = BasicClient::new(ClientId::new(self.client_id.clone()))
-            .set_auth_uri(AuthUrl::new(
-                "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize".to_string(),
-            )
-                .unwrap())
-            .set_token_uri(TokenUrl::new(
-                "https://login.microsoftonline.com/consumers/oauth2/v2.0/token".to_string(),
-            )
-                .unwrap())
-            .set_redirect_uri(RedirectUrl::new(self.redirect_uri.clone()).unwrap());
-
-        let oauth_http = reqwest::Client::builder()
-            .redirect(reqwest::redirect::Policy::none())
-            .build()?;
-
-        let microsoft_token = oauth_client
-            .exchange_code(AuthorizationCode::new(code))
-            .set_pkce_verifier(PkceCodeVerifier::new(pkce_verifier))
-            .request_async(&oauth_http)
-            .await?;
-
-        // 2) Authenticate to Xbox Live.
-        let xbl_body = serde_json::json!({
-            "Properties": {
-                "AuthMethod": "RPS",
-                "SiteName": "user.auth.xboxlive.com",
-                "RpsTicket": format!("d={}", microsoft_token.access_token().secret()),
-            },
-            "RelyingParty": "http://auth.xboxlive.com",
-            "TokenType": "JWT",
-        });
-
-        let xbl = reqwest::Client::new()
-            .post("https://user.auth.xboxlive.com/user/authenticate")
-            .json(&xbl_body)
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<Value>()
-            .await?;
-        let xbl_token = xbl["Token"]
-            .as_str()
-            .ok_or_else(|| missing("Token"))?
-            .to_string();
-
-        // 3) Exchange Xbox token for XSTS token.
-        let xsts_body = serde_json::json!({
-            "Properties": {
-                "SandboxId": "RETAIL",
-                "UserTokens": [xbl_token],
-            },
-            "RelyingParty": "rp://api.minecraftservices.com/",
-            "TokenType": "JWT",
-        });
-
-        let xsts_response = reqwest::Client::new()
-            .post("https://xsts.auth.xboxlive.com/xsts/authorize")
-            .json(&xsts_body)
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<Value>()
-            .await?;
-
-        let uhs = xsts_response["DisplayClaims"]["xui"][0]["uhs"]
-            .as_str()
-            .ok_or_else(|| missing("DisplayClaims.xui[0].uhs"))?
-            .to_string();
-        let xsts_token = xsts_response["Token"]
-            .as_str()
-            .ok_or_else(|| missing("Token"))?
-            .to_string();
-
-        // 4) Authenticate to Minecraft services.
-        let mc_body = serde_json::json!({
-            "identityToken": format!("XBL3.0 x={uhs};{xsts_token}")
-        });
-
-        let mc_response = reqwest::Client::new()
-            .post("https://api.minecraftservices.com/authentication/login_with_xbox")
-            .json(&mc_body)
-            .send()
-            .await?;
-
-        let mc_status = mc_response.status();
-        let mc_body_text = mc_response.text().await?;
-        if !mc_status.is_success() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!(
-                    "minecraft login_with_xbox failed: status={mc_status}, body={mc_body_text}"
-                ),
-            )
-                .into());
-        }
-
-        let mc: Value = serde_json::from_str(&mc_body_text)?;
-        let mc_access_token = mc["access_token"]
-            .as_str()
-            .ok_or_else(|| missing("access_token"))?
-            .to_string();
-        let mc_expires_in = mc["expires_in"]
-            .as_i64()
-            .ok_or_else(|| missing("expires_in"))?;
-
-        // 5) Fetch Minecraft profile.
-        let profile = reqwest::Client::new()
-            .get("https://api.minecraftservices.com/minecraft/profile")
-            .bearer_auth(&mc_access_token)
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<Value>()
-            .await?;
-
-        let profile_id = profile["id"]
-            .as_str()
-            .ok_or_else(|| missing("id"))?
-            .to_string();
-        let profile_name = profile["name"]
-            .as_str()
-            .ok_or_else(|| missing("name"))?
-            .to_string();
-
-        let expires_at = SystemTime::now()
-            .duration_since(UNIX_EPOCH)?
-            .as_secs() as i64
-            + mc_expires_in;
-
-        let refresh_token = microsoft_token
-            .refresh_token()
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::Other, "missing refresh token"))?
-            .secret()
-            .to_string();
-
-        Ok(Account {
-            id: profile_id.clone(),
-            username: profile_name,
-            account_type: AccountType::Microsoft,
-            session: Session::Microsoft(MicrosoftSession {
-                access_token: mc_access_token,
-                refresh_token,
-                uuid: profile_id,
-                expires_at,
-            }),
-        })
     }
 }
