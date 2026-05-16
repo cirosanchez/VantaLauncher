@@ -29,7 +29,7 @@ focused on satisfying all your needs.
 
 - [x] Automatic settings.toml with color fields
 - [x] Sidebar
-- [ ] Microsoft and Offline Accounts (AUTH)
+- [x] Microsoft and Offline Accounts (AUTH)
 - [ ] Home page
 - [ ] Profiles page
 - [ ] Per profile configuration
