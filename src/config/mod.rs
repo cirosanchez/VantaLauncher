@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 
-const DEFAULT_SETTINGS: &str = include_str!("../default_settings.toml");
+const DEFAULT_SETTINGS: &str = include_str!("../../default_settings.toml");
 
 // a public structure, something similar to a data class in Kotlin.
 // #derive basically implements methods automatically for deserialization, serialization and debug

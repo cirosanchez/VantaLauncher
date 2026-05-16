@@ -28,14 +28,19 @@ focused on satisfying all your needs.
 ## Roadmap
 
 - [x] Automatic settings.toml with color fields
-- [x] Sidebar 
+- [x] Sidebar
+- [ ] Microsoft and Offline Accounts (AUTH)
 - [ ] Home page
 - [ ] Profiles page
+- [ ] Per profile configuration
 - [ ] Worlds page
-- [ ] Servers page
+- [ ] Cherished Worlds
+- [ ] Servers page 
+- [ ] Favorite servers 
 - [ ] Modrinth page
+- [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Curseforge page
-- [ ] Microsoft and Offline Accounts
+- [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Settings page
 
 ## ⚙️ Configuration
