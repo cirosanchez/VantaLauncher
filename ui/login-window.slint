@@ -1,0 +1,146 @@
+import { Button, VerticalBox, LineEdit, HorizontalBox } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+
+export component LoginWindow inherits Window {
+    callback login_microsoft();
+    callback login_offline(string);
+
+    background: Theme.accent_1;
+    title: "Vanta Launcher";
+    preferred-width: 440px;
+    preferred-height: 520px;
+    min-width: 440px;
+    min-height: 520px;
+    no-frame: false; // Keep frame for now, but we'll style the interior
+
+    // UI state
+    property <bool> showing_offline_input: false;
+
+    Rectangle {
+        background: Theme.accent_2;
+        border-color: Theme.accent_3;
+        border-width: 2px;
+        border-radius: 16px;
+        clip: true;
+
+        VerticalBox {
+            alignment: center;
+            spacing: 30px;
+            padding: 40px;
+
+            // Header Section
+            VerticalBox {
+                alignment: center;
+                spacing: 12px;
+
+                HorizontalBox {
+                    Image {
+                        source: @image-url("../assets/logo.png");
+                        width: 84px;
+                        height: 84px;
+                        vertical-alignment: center;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "Vanta Launcher";
+                        color: Theme.accent_11;
+                        font-size: 24px;
+                        font-weight: 700;
+                        vertical-alignment: center;
+                        horizontal-alignment: center;
+                    }
+                }
+
+                Text {
+                    text: "Sign in to continue to Minecraft";
+                    color: Theme.accent_6;
+                    font-size: 14px;
+                    horizontal-alignment: center;
+                }
+            }
+
+            // Action Section
+            if (!showing_offline_input): VerticalBox {
+                spacing: 16px;
+
+                Button {
+                    text: "Login with Microsoft";
+                    primary: true;
+                    height: 40px;
+                    clicked => {
+                        login_microsoft()
+                    }
+                }
+
+                Rectangle {
+                    height: 1px;
+                    background: Theme.accent_3;
+                    width: 60%;
+                }
+
+                Button {
+                    text: "Use Offline Account";
+                    height: 40px;
+                    clicked => {
+                        showing_offline_input = true
+                    }
+                }
+            }
+
+            if (showing_offline_input): VerticalBox {
+                spacing: 20px;
+
+                VerticalBox {
+                    spacing: 8px;
+                    padding: 0;
+                    Text {
+                        text: "Player Name";
+                        color: Theme.accent_8;
+                        font-size: 13px;
+                    }
+
+                    username_input := LineEdit {
+                        placeholder-text: "Enter username...";
+                        height: 40px;
+                        accepted => {
+                            if (self.text != "") {
+                                login_offline(self.text)
+                            }
+                        }
+                    }
+                }
+
+                VerticalBox {
+                    spacing: 12px;
+                    padding: 0;
+                    Button {
+                        text: "Continue";
+                        primary: true;
+                        height: 40px;
+                        enabled: username_input.text != "";
+                        clicked => {
+                            login_offline(username_input.text)
+                        }
+                    }
+
+                    Button {
+                        text: "Back";
+                        height: 40px;
+                        clicked => {
+                            showing_offline_input = false
+                        }
+                    }
+                }
+            }
+
+            // Footer
+            Text {
+                text: "0.0.1";
+                color: Theme.accent_4;
+                font-size: 10px;
+                horizontal-alignment: center;
+            }
+        }
+    }
+}
