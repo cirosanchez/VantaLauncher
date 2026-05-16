@@ -2,6 +2,7 @@ mod auth;
 mod config;
 mod providers;
 mod theme;
+mod download;
 
 use std::error::Error;
 use std::sync::Arc;
