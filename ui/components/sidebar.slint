@@ -1,8 +1,10 @@
 import { Separator } from "separator.slint";
 import { Icon } from "icon.slint";
-import { Theme } from "../theme.slint";
+import { Theme, Page } from "../theme.slint";
 
 export component Sidebar inherits Rectangle {
+    in property <image> account_head_image;
+
     width: 45px;
     height: 100%; // Default to full height, can be overridden
 
@@ -11,11 +13,14 @@ export component Sidebar inherits Rectangle {
     border-width: 2px;
     background: Theme.accent_2;
 
+    callback navigate(Page);
+
     Icon {
         source: @image-url("../../assets/logo.png");
         x: 7px;
         y: 12px;
-        clicked => { debug("logo clicked") }
+        tooltip: "Vanta Launcher";
+        clicked => {  }
     }
 
     Separator {
@@ -33,7 +38,8 @@ export component Sidebar inherits Rectangle {
         y: 68px;
         width: 24px;
         height: 24px;
-        clicked => { debug("home clicked") }
+        tooltip: "Home";
+        clicked => { root.navigate(Page.Home) }
     }
 
     Icon {
@@ -44,7 +50,8 @@ export component Sidebar inherits Rectangle {
         y: 104px;
         width: 24px;
         height: 24px;
-        clicked => { debug("library clicked") }
+        tooltip: "Profiles";
+        clicked => { root.navigate(Page.Library) }
     }
 
     Icon {
@@ -55,7 +62,8 @@ export component Sidebar inherits Rectangle {
         y: 140px;
         width: 24px;
         height: 24px;
-        clicked => { debug("worlds clicked") }
+        tooltip: "Worlds";
+        clicked => { root.navigate(Page.Worlds) }
     }
 
     Icon {
@@ -66,7 +74,8 @@ export component Sidebar inherits Rectangle {
         y: 176px;
         width: 24px;
         height: 24px;
-        clicked => { debug("servers clicked") }
+        tooltip: "Servers";
+        clicked => { root.navigate(Page.Servers) }
     }
 
     Separator {
@@ -84,7 +93,8 @@ export component Sidebar inherits Rectangle {
         y: 224px;
         width: 24px;
         height: 24px;
-        clicked => { debug("modrinth clicked") }
+        tooltip: "Modrinth";
+        clicked => { root.navigate(Page.Modrinth) }
     }
 
     Icon {
@@ -95,13 +105,91 @@ export component Sidebar inherits Rectangle {
         y: 260px;
         width: 24px;
         height: 24px;
-        clicked => { debug("curseforge clicked") }
+        tooltip: "Curseforge";
+        clicked => { root.navigate(Page.CurseForge) }
     }
 
     Separator {
         separator_color: Theme.accent_3;
         width: parent.width - 24px;
         x: 12px;
-        y: 272px;
+        y: parent.height - 96px;
+    }
+
+    Icon {
+        source: @image-url("../../assets/icons/settings.svg");
+        color: Theme.accent_6;
+        hover_color: Theme.accent_7;
+        x: 10.5px;
+        y: parent.height - 84px;
+        width: 24px;
+        height: 24px;
+        tooltip: "Settings";
+        clicked => { root.navigate(Page.Settings) }
+    }
+
+    account-head-touch := TouchArea {
+        x: 8.5px;
+        y: parent.height - 44px;
+        width: 28px;
+        height: 28px;
+        mouse-cursor: pointer;
+
+        clicked => {
+            root.navigate(Page.Accounts)
+        }
+    }
+
+    Rectangle {
+        x: account-head-touch.x;
+        y: account-head-touch.y;
+        width: account-head-touch.width;
+        height: account-head-touch.height;
+
+        border-color: Theme.accent_3;
+        border-width: 2px;
+        border-radius: 4px;
+        clip: true;
+
+        Image {
+            source: root.account_head_image;
+            image-fit: contain;
+            width: account-head-touch.has-hover ? 26px : 24px;
+            height: account-head-touch.has-hover ? 26px : 24px;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+
+            animate width { duration: 130ms; }
+            animate height { duration: 130ms; }
+        }
+
+        Rectangle {
+            x: 0px;
+            y: 0px;
+            width: parent.width;
+            height: parent.height;
+            background: account-head-touch.has-hover ? #ffffff22 : #ffffff00;
+
+            animate background { duration: 130ms; }
+        }
+    }
+
+    if (account-head-touch.has-hover): Rectangle {
+        x: account-head-touch.x + account-head-touch.width + 8px;
+        y: account-head-touch.y - 1px;
+
+        width: tooltip-text.preferred-width + 16px;
+        height: 30px;
+
+        background: #181818ee;
+        border-radius: 6px;
+
+        tooltip-text := Text {
+            text: "Account";
+            color: white;
+
+            x: 8px;
+            y: 7px;
+        }
     }
 }

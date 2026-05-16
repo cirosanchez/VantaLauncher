@@ -1,5 +1,5 @@
-use crate::auth::microsoft::{MicrosoftAuth, MicrosoftLoginRequest};
-use crate::auth::offline::create_offline_account;
+use crate::auth::session::microsoft::{MicrosoftAuth, MicrosoftLoginRequest};
+use crate::auth::session::offline::create_offline_account;
 use crate::auth::storage::{AuthData, AuthStorage};
 use crate::auth::Account;
 use axum::extract::{Query, State};
@@ -9,6 +9,7 @@ use axum::{http::StatusCode, Router};
 use serde::Deserialize;
 use std::error::Error;
 use std::sync::Arc;
+use slint::ComponentHandle;
 use tokio::net::TcpListener;
 use tokio::sync::{oneshot, Mutex};
 
@@ -47,21 +48,6 @@ impl AccountManager {
         data.accounts.iter().find(|a| &a.id == id).cloned()
     }
 
-    pub async fn list_accounts(&self) -> Vec<Account> {
-        self.data.lock().await.accounts.clone()
-    }
-
-    pub async fn set_active_account(&self, id: &str) -> bool {
-        let mut data = self.data.lock().await;
-        if data.accounts.iter().any(|a| a.id == id) {
-            data.active_account_id = Some(id.to_string());
-            AuthStorage::save(&data);
-            true
-        } else {
-            false
-        }
-    }
-
     pub async fn login_offline(&self, username: &str) -> Account {
         let account = create_offline_account(username);
         self.add_account(account.clone()).await;
@@ -74,36 +60,96 @@ impl AccountManager {
 
     pub async fn login_microsoft_interactive(&self) -> AuthResult<Account> {
         let request = self.begin_microsoft_login();
+        let callback = self.wait_for_microsoft_callback(&request).await?;
+        let account = self
+            .microsoft
+            .finish_login(callback.code, request.pkce_verifier)
+            .await?;
+        self.add_account(account.clone()).await;
+        Ok(account)
+    }
+
+    pub async fn ensure_authenticated_with_login_window(
+        self: Arc<Self>,
+        login_ui: crate::LoginWindow,
+    ) -> Result<bool, slint::PlatformError> {
+        if self.get_active_account().await.is_some() {
+            return Ok(true);
+        }
+
+        let am_clone = self.clone();
+        let handle = login_ui.as_weak();
+        login_ui.on_login_microsoft(move || {
+            let am = am_clone.clone();
+            let h = handle.clone();
+            tokio::spawn(async move {
+                match am.login_microsoft_interactive().await {
+                    Ok(_) => {
+                        let _ = slint::invoke_from_event_loop(move || {
+                            if let Some(window) = h.upgrade() {
+                                let _ = window.hide();
+                            }
+                        });
+                    }
+                    Err(err) => {
+                        eprintln!("microsoft login failed: {err}");
+                    }
+                }
+            });
+        });
+
+        let am_clone = self.clone();
+        let handle = login_ui.as_weak();
+        login_ui.on_login_offline(move |username| {
+            let am = am_clone.clone();
+            let h = handle.clone();
+            let username = username.to_string();
+            tokio::spawn(async move {
+                am.login_offline(&username).await;
+                let _ = slint::invoke_from_event_loop(move || {
+                    if let Some(window) = h.upgrade() {
+                        let _ = window.hide();
+                    }
+                });
+            });
+        });
+
+        login_ui.run()?;
+        Ok(self.get_active_account().await.is_some())
+    }
+
+    async fn wait_for_microsoft_callback(
+        &self,
+        request: &MicrosoftLoginRequest,
+    ) -> AuthResult<MicrosoftCallbackPayload> {
         let callback_state = Arc::new(CallbackServerState::new(request.state.clone()));
         let (tx, rx) = oneshot::channel();
-
         callback_state.set_sender(tx).await;
 
         let app = Router::new()
             .route("/callback", get(handle_microsoft_callback))
-            .with_state(callback_state.clone());
+            .with_state(callback_state);
 
         let listener = TcpListener::bind("127.0.0.1:6767").await?;
         let server = tokio::spawn(async move {
             let _ = axum::serve(listener, app).await;
         });
 
-        open::that(&request.auth_url)?;
-
-        let callback = match rx.await {
-            Ok(result) => result?,
-            Err(_) => {
-                server.abort();
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::BrokenPipe,
-                    "Microsoft callback channel closed",
-                )
-                .into());
-            }
-        };
-
-        if callback.state != request.state {
+        if let Err(err) = open::that(&request.auth_url) {
             server.abort();
+            return Err(err.into());
+        }
+
+        let callback_result = rx.await.map_err(|_| {
+            std::io::Error::new(
+                std::io::ErrorKind::BrokenPipe,
+                "Microsoft callback channel closed",
+            )
+        })?;
+        server.abort();
+
+        let callback = callback_result?;
+        if callback.state != request.state {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidData,
                 "Microsoft callback state did not match",
@@ -111,15 +157,7 @@ impl AccountManager {
             .into());
         }
 
-        let account = self
-            .microsoft
-            .finish_login(callback.code, request.pkce_verifier)
-            .await?;
-
-        self.add_account(account.clone()).await;
-
-        server.abort();
-        Ok(account)
+        Ok(callback)
     }
 }
 

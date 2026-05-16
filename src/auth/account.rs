@@ -1,11 +1,25 @@
-use crate::auth::types::{Account, AccountType, Session};
+use crate::auth::session::Session;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) enum AccountType {
+    Microsoft,
+    Offline,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Account {
+    pub(crate) id: String,
+    pub(crate) username: String,
+    pub(crate) account_type: AccountType,
+    pub(crate) session: Session,
+}
 
 impl Account {
-    pub fn is_microsoft(&self) -> bool {
-        matches!(self.account_type, AccountType::Microsoft)
-    }
-
-    pub fn is_offline(&self) -> bool {
-        matches!(self.account_type, AccountType::Offline)
+    pub fn avatar_url(&self) -> String {
+        match self.account_type {
+            AccountType::Microsoft => format!("https://mc-heads.net/avatar/{}", self.id),
+            AccountType::Offline => "https://mc-heads.net/avatar/0".to_string(),
+        }
     }
 }
