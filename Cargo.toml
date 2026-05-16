@@ -13,13 +13,13 @@ toml = "0.8"
 uuid = { version = "1.23.1", features = ["v3"] }
 oauth2 = "5"
 open = "5"
-axum = "0.8"
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls", "stream"] }
 serde_json = "1"
 keyring = "3"
 minecraft-msa-auth = "0.4.0"
 anyhow = "1.0.102"
+futures-util = "0.3.32"
 
 [build-dependencies]
 slint-build = "1.14.1"
