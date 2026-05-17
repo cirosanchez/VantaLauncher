@@ -1,9 +1,18 @@
 use vantalauncher::minecraft::versions::types::VersionType;
-use vantalauncher::minecraft::versions::service::{by_type, fetch_manifest};
+use vantalauncher::minecraft::versions::service::{by_type, get_version_metadata};
+
+use anyhow::Result;
 
 #[tokio::test]
-async fn fetches_manifest() {
-    let releases = by_type(VersionType::OldAlpha).await.unwrap();
+async fn fetches_manifest() -> Result<()> {
+    let versions = by_type(VersionType::Release).await?;
 
-    releases.into_iter().for_each(|v| { println!("{:?}", v.id); });
+    let version = versions
+        .iter()
+        .find(|v| v.id == "1.21.5")
+        .unwrap();
+
+    let metadata = get_version_metadata(version).await?;
+    
+    Ok(())
 }
