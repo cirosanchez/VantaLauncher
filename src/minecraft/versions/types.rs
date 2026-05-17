@@ -16,7 +16,16 @@ pub struct LatestVersions {
 pub struct VersionInfo {
     pub id: String,
     #[serde(rename = "type")]
-    pub version_type: String,
+    pub version_type: VersionType,
     pub url: String,
     pub sha1: String,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum VersionType {
+    Release,
+    Snapshot,
+    OldBeta,
+    OldAlpha,
 }
