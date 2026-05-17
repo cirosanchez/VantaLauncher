@@ -3,6 +3,7 @@ mod config;
 mod providers;
 mod theme;
 mod download;
+mod minecraft;
 
 use std::error::Error;
 use std::sync::Arc;
@@ -56,3 +57,5 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     ui.run()?;
     Ok(())
 }
+
+
