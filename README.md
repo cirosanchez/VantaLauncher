@@ -42,6 +42,10 @@ focused on satisfying all your needs.
 - [ ] Curseforge page
 - [ ] Modpacks, Mods, Shaders, Texturepacks, Datapacks
 - [ ] Settings page
+- [ ] Accounts Page (working on it)
+- [ ] Skin Selector for the active account
+- [ ] Cape Selector for the active account
+- [ ] Account selector among existent accounts with a new account button
 
 ## ⚙️ Configuration
 
