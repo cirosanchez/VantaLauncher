@@ -1,0 +1,56 @@
+import { Button, VerticalBox } from "std-widgets.slint";
+import { Sidebar } from "components/sidebar.slint";
+import { Theme, Page } from "theme.slint";
+import { HomePage } from "pages/home.slint";
+import { ProfilesPage } from "pages/profiles.slint";
+import { WorldsPage } from "pages/worlds.slint";
+import { SettingsPage } from "pages/settings.slint";
+import { ServersPage } from "pages/servers.slint";
+import { ModrinthPage } from "pages/modrinth.slint";
+import { CurseforgePage } from "pages/curseforge.slint";
+import { AccountsPage } from "pages/accounts.slint";
+
+export { Theme, Page }
+
+export component AppWindow inherits Window {
+    in-out property <Page> current-page: Page.Home;
+    in property <image> account-head-image;
+
+    background: Theme.accent_1;
+
+    preferred-width: 1280px;
+    preferred-height: 720px;
+    min-width: 1000px;
+    min-height: 600px;
+
+    Rectangle {
+        x: 80px;
+        y: 20px;
+
+        width: parent.width - 100px;
+        height: parent.height - 40px;
+
+        background: Theme.accent_2;
+        border-radius: 16px;
+
+        if (root.current-page == Page.Home): HomePage { }
+        if (root.current-page == Page.Library): ProfilesPage { }
+        if (root.current-page == Page.Worlds): WorldsPage { }
+        if (root.current-page == Page.Servers): ServersPage { }
+        if (root.current-page == Page.Modrinth): ModrinthPage { }
+        if (root.current-page == Page.CurseForge): CurseforgePage { }
+        if (root.current-page == Page.Settings): SettingsPage { }
+        if (root.current-page == Page.Accounts): AccountsPage { }
+    }
+
+    Sidebar {
+        x: 20px;
+        y: 20px;
+        height: parent.height - 40px;
+        account_head_image: root.account-head-image;
+
+        navigate(page) => {
+            root.current-page = page;
+        }
+    }
+}
